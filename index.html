@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Data Sources Quiz</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen py-8">
+    <div id="root"></div>
+
+```
+<script type="text/babel">
+    const { useState, useEffect } = React;
+    
+    const CheckCircle = ({ className, size }) => (
+        <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+    );
+
+    const XCircle = ({ className, size }) => (
+        <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="15" y1="9" x2="9" y2="15"></line>
+            <line x1="9" y1="9" x2="15" y2="15"></line>
+        </svg>
+    );
+
+    const RotateCcw = ({ size }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <polyline points="1 4 1 10 7 10"></polyline>
+            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+        </svg>
+    );
+
+    const Clock = ({ size }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+    );
+
+    const Quiz = () => {
+        const [currentQuestion, setCurrentQuestion] = useState(0);
+        const [selectedAnswer, setSelectedAnswer] = useState(null);
+        const [showExplanation, setShowExplanation] = useState(false);
+        const [score, setScore] = useState(0);
+        const [quizComplete, setQuizComplete] = useState(false);
+        const [timeRemaining, setTimeRemaining] = useState(120); // 2 minutes in seconds
+        const [canProceed, setCanProceed] = useState(false);
+
+        const questions = [
+            {
+                question: "A UK-based investment analyst needs to verify director changes, view registered charges on assets, and access the most recent annual accounts for a private limited company. Which source provides this authoritative information, and why is it considered primary?",
+                options: [
+                    "Yahoo Finance - it aggregates data from multiple sources including regulatory bodies",
+                    "Companies House - it holds original statutory filings submitted directly by companies as required by the Companies Act 2006",
+                    "Financial Times - it reports on all UK company changes and financial results",
+                    "Bloomberg Terminal - it provides the most comprehensive financial data available"
+                ],
+                correct: 1,
+                explanation: "Companies House is the primary source because it contains ORIGINAL statutory filings that companies are legally required to submit under the Companies Act 2006. Primary sources are 'original, authoritative documents produced by entity or regulator.' Yahoo Finance and Bloomberg are secondary (they reorganize data), and FT is commentary/analysis."
+            },
+            {
+                question: "According to Lusardi and Mitchell's (2014) definition, financial literacy is the 'ability to process economic information and make informed decisions about financial planning, wealth accumulation, and debt.' A manager evaluates whether to take a business loan at 8% APR versus using retained earnings. Which aspect of financial literacy is MOST directly being applied?",
+                options: [
+                    "Investment screening - comparing returns on different assets",
+                    "Credit decisions - evaluating interest rates, repayment schedules, and affordability",
+                    "Risk assessment - understanding volatility and cash flow risk",
+                    "Performance evaluation - interpreting KPIs and operating margins"
+                ],
+                correct: 1,
+                explanation: "The lecture explicitly lists 'Credit decisions: evaluating interest rates, repayment schedules, and affordability' as a financial literacy application. The manager is evaluating a loan (credit) by assessing the interest rate (8% APR) and whether it's affordable versus alternatives. While risk is involved, the PRIMARY action is a credit decision."
+            },
+            {
+                question: "An investor downloads Netflix's 10-K from SEC EDGAR and finds: consolidated income statement, balance sheet, cash flow statement, segment disclosures, auditor's report, and risk factors. The investor then checks Bloomberg Terminal for Netflix's P/E ratio, analyst forecasts, and ESG metrics. What is the fundamental difference between these two sources?",
+                options: [
+                    "SEC EDGAR is free while Bloomberg requires subscription",
+                    "SEC EDGAR contains primary data (original company filings) while Bloomberg provides secondary data (reorganized and interpreted information with added analytics)",
+                    "SEC EDGAR is for US companies only while Bloomberg covers global markets",
+                    "SEC EDGAR is updated annually while Bloomberg provides real-time data"
+                ],
+                correct: 1,
+                explanation: "The lecture defines secondary sources as those that 'reorganise and interpret data from primary reports, making it easier to compare companies, analyse performance, and support trading or forecasting.' The 10-K is an original filing (primary), while Bloomberg takes that data, calculates ratios, adds analyst forecasts, and provides analytics (secondary). Cost, geography, and timing are differences, but not the FUNDAMENTAL distinction."
+            },
+            {
+                question: "A company's annual report states: 'We are expanding into renewable energy sectors to align with global sustainability trends and regulatory requirements.' This same report shows: Revenue £500m, Net Income £45m, Total Assets £800m, ROE 15.2%. How should these two types of information be classified and why does this distinction matter?",
+                options: [
+                    "Both are quantitative because they come from the same annual report",
+                    "The expansion statement is qualitative (describes strategy/context) while the financial figures are quantitative (numerical and measurable); this matters because qualitative provides context for interpreting quantitative metrics",
+                    "The expansion statement is secondary data while the figures are primary data",
+                    "Both are qualitative because they require interpretation by analysts"
+                ],
+                correct: 1,
+                explanation: "The lecture defines qualitative as 'non-numerical information that describes qualities, context, or explanations (e.g., strategy, risks, management commentary)' and quantitative as 'numerical information that can be measured and analysed statistically.' The expansion statement describes strategy (qualitative), while revenue/ROE are numerical metrics (quantitative). Understanding this distinction helps analysts combine numerical performance with strategic context."
+            },
+            {
+                question: "Under IFRS and the Companies Act 2006, company directors must provide 'a true and fair view' of financial position. An analyst comparing two companies finds both report £10m revenue, but one used aggressive revenue recognition (booking future sales early) while the other was conservative. What does this scenario reveal about financial literacy requirements?",
+                options: [
+                    "Financial literacy only requires ability to read the numbers reported",
+                    "Financial literacy requires understanding the recognition and measurement principles behind reported figures, not just reading the final numbers",
+                    "This is a regulatory compliance issue unrelated to financial literacy",
+                    "The Companies Act prevents this scenario from occurring"
+                ],
+                correct: 1,
+                explanation: "The lecture states that IFRS 'sets recognition and measurement principles that shape how financial data is presented' and managers/analysts 'must understand the reports produced.' True financial literacy means understanding WHAT the numbers represent and HOW they were calculated, not just reading them. Both companies report £10m, but understanding recognition principles reveals they're not comparable - this requires deeper literacy than number-reading."
+            },
+            {
+                question: "A UK publicly listed company experiences a major cybersecurity breach compromising customer data. Within hours, it must disclose this to investors. Where would this disclosure FIRST appear, and what type of filing would it be?",
+                options: [
+                    "Companies House - as an updated confirmation statement",
+                    "Company's annual report - in the risk factors section",
+                    "London Stock Exchange - as a regulatory news service (RNS) announcement, similar to SEC Form 8-K for material events",
+                    "Bloomberg Terminal - in the news feed section"
+                ],
+                correct: 2,
+                explanation: "The lecture explains that stock exchange disclosures contain 'company news that must be shared with investors' and mentions Form 8-K for 'material events (acquisitions, leadership changes, litigation).' A major cybersecurity breach is a material event requiring immediate disclosure to the market via the London Stock Exchange's RNS (Regulatory News Service). Annual reports are retrospective, Companies House filings aren't immediate, and Bloomberg would only report it after the primary disclosure."
+            },
+            {
+                question: "An analyst evaluating Tesla needs: real-time stock prices, historical 5-year price data, analyst earnings forecasts, company fundamentals (revenue, margins), and broker research reports. Which combination of sources would be MOST appropriate and why?",
+                options: [
+                    "Only Bloomberg Terminal - it contains everything needed in one place",
+                    "SEC EDGAR for all data - it's the authoritative source for US companies",
+                    "Primary source (SEC 10-K for fundamentals/historical data) + Secondary source (Bloomberg or LSEG for real-time prices, forecasts, and broker research) - because each serves different analytical needs",
+                    "Yahoo Finance for everything - it's free and contains all the required information"
+                ],
+                correct: 2,
+                explanation: "The lecture distinguishes primary sources (original filings with fundamentals and historical financial data) from secondary sources (which 'reorganise and interpret data' and provide 'real-time market data,' 'analyst forecasts,' and 'broker research reports'). For comprehensive analysis, you need BOTH: primary for verified company-reported data and secondary for market analytics and forecasts. While Bloomberg alone could work, the principle is understanding what each source type offers."
+            },
+            {
+                question: "The Office for National Statistics (ONS) publishes: UK GDP growth 2.1%, CPI inflation 4.2%, unemployment rate 4.5%, and average wage growth 5.8%. A fund manager uses this data to predict consumer spending patterns and assess retail sector investment opportunities. How is this data classified in the lecture framework?",
+                options: [
+                    "Primary quantitative data from government statistical agencies, used for macroeconomic context",
+                    "Secondary qualitative data providing market commentary",
+                    "Primary qualitative data describing economic conditions",
+                    "This is not financial data as it's not company-specific"
+                ],
+                correct: 0,
+                explanation: "The lecture lists ONS under 'Other Sources' providing numerical economic indicators like 'GDP,' 'Inflation (CPI, RPI),' 'Employment and wage statistics.' This is PRIMARY data (original from authoritative government source) and QUANTITATIVE (all numerical and measurable). While not company-specific, the lecture explicitly includes macroeconomic data as relevant financial information for business decision-making and 'contextual understanding.'"
+            },
+            {
+                question: "A professional trader pays £24,000/year for Bloomberg Terminal while a university student uses free Yahoo Finance. Both access Apple's income statement. The lecture asks: 'Why might a professional trader rely on Bloomberg, while a student or casual investor uses Yahoo Finance?' What is the BEST explanation?",
+                options: [
+                    "Bloomberg data is more accurate than Yahoo Finance data",
+                    "Bloomberg provides real-time data, advanced analytics, trading tools, and professional features (customizable screens, API access, news integration) that traders need for rapid decision-making; Yahoo Finance provides accessible, user-friendly basic research suitable for learning and simple analysis",
+                    "Only Bloomberg has legal rights to display financial statement data",
+                    "Students cannot afford Bloomberg so they must use Yahoo Finance"
+                ],
+                correct: 1,
+                explanation: "The lecture comparison states: 'Bloomberg: Used by professionals for real-time data, analytics, and trading tools' versus 'Yahoo Finance: Free, user-friendly, and suitable for basic research and learning.' The key is FUNCTIONALITY and PURPOSE, not just cost or accuracy. Traders need 'advanced features' for professional decision-making, while students need 'accessible information' for learning. Both can show the same income statement, but Bloomberg adds layers of analytics, speed, and tools."
+            },
+            {
+                question: "A company's proxy statement (filed as part of regulatory requirements) reveals: CEO total compensation £5.2m (up 18% from previous year), including £3m base salary, £1.5m bonus tied to EPS growth, £0.7m stock options. It also shows the board has 8 members, 3 are independent, and there's a new audit committee chair. How should an investor interpret this information's relevance?",
+                options: [
+                    "This is purely administrative information with no investment relevance",
+                    "This is qualitative data about governance that provides context for assessing management incentives, board independence, and alignment of executive pay with shareholder interests - relevant for corporate governance analysis",
+                    "This is quantitative data that should be added to the company's expenses",
+                    "Proxy statements are secondary sources so this information is less reliable"
+                ],
+                correct: 1,
+                explanation: "The lecture identifies proxy statements as primary sources containing 'executive pay, board structure' and emphasizes that 'corporate governance expectations: boards, investors, and regulators rely on transparent and accurate financial information.' While the compensation figures are numerical, the MEANING is qualitative - describing governance quality, incentive alignment, and board independence. The lecture's discussion of ESG and governance shows this is investment-relevant information."
+            },
+            {
+                question: "An analyst reads in the Financial Times: 'Retail sector faces headwinds as consumer confidence drops amid inflation concerns. Major chains report margin pressure.' Separately, she accesses Tesco's 10-K showing: Revenue £65bn, Operating Margin 3.2% (down from 4.1%), and management states: 'Rising input costs and competitive pricing environment impacted profitability.' Which source provides what type of value?",
+                options: [
+                    "Both are secondary sources providing the same information in different formats",
+                    "FT is secondary providing qualitative sector context and trends; the 10-K is primary providing quantitative company-specific data and qualitative management explanation - together they enable informed analysis",
+                    "FT is more valuable because it covers the entire sector, not just one company",
+                    "The 10-K is the only reliable source; FT is just opinion and should be ignored"
+                ],
+                correct: 1,
+                explanation: "The lecture identifies 'Financial Press' as secondary sources 'useful for contextual understanding' providing 'analyst commentary, market trends, sector-specific analysis.' The 10-K (via SEC) is primary, providing original quantitative data (revenue, margins) and qualitative commentary (management discussion). The lecture emphasizes using BOTH: 'Traders need advanced features; students often need accessible information.' Combined analysis uses sector context (FT) with specific data (10-K) for complete understanding."
+            },
+            {
+                question: "Under the lecture's framework, what would be the MOST comprehensive approach for a prospective investor to evaluate a UK-listed pharmaceutical company considering: financial health, strategic direction, regulatory risks, market performance, sector trends, and ESG credentials?",
+                options: [
+                    "Access only the company's annual report - it contains all necessary information",
+                    "Use only Bloomberg Terminal - it aggregates everything into one platform",
+                    "Combine primary sources (annual report from company website/Companies House for financials, governance, strategy, risks) + secondary sources (Bloomberg/LSEG for market data, ratios, ESG metrics) + financial press (FT for sector trends, regulatory developments) + government data (ONS for macroeconomic context)",
+                    "Use only free sources like Yahoo Finance to avoid subscription costs"
+                ],
+                correct: 2,
+                explanation: "The lecture presents multiple source types for a reason - each serves different analytical purposes. Comprehensive analysis requires: PRIMARY sources for original data and company-stated strategy/risks; SECONDARY sources to 'reorganise and interpret data from primary reports, making it easier to compare companies, analyse performance'; financial press for 'contextual understanding' of 'sector-specific analysis' and 'regulatory developments'; and government data for macroeconomic context. No single source provides complete information for all evaluation criteria."
+            },
+            {
+                question: "A company's annual report includes a section titled 'Management Discussion and Analysis' (MD&A) stating: 'The 15% revenue decline was primarily driven by supply chain disruptions in Q2 and Q3, affecting our ability to fulfill orders. We've since diversified suppliers and expect recovery in the next fiscal year.' How does this information enhance an investor's financial literacy beyond just seeing '15% revenue decline' in the income statement?",
+                options: [
+                    "It doesn't - the number tells the full story and MD&A is just management making excuses",
+                    "It provides qualitative context explaining WHY the quantitative decline occurred, what management attributes it to, and what actions they're taking - enabling informed judgment about whether this is a temporary issue or fundamental business problem",
+                    "It's a regulatory requirement but has no analytical value for investors",
+                    "It's secondary data that contradicts the primary financial statement data"
+                ],
+                correct: 1,
+                explanation: "The lecture emphasizes qualitative data includes 'management discussion' and 'strategic priorities,' with examples from 'MD&A sections.' Financial literacy isn't just reading numbers - it's 'the ability to process economic information and make informed decisions.' Understanding WHY revenue declined (supply chain - potentially temporary) versus a fundamental business failure (losing customers) is critical for 'investment decisions: screening a company before buying its shares.' Qualitative context makes quantitative data actionable."
+            },
+            {
+                question: "An investor wants to analyze a company's debt structure, including types of debt instruments, maturity schedules, interest rates, and any secured charges against assets. Which combination of sources would provide the MOST complete picture, and what would each contribute?",
+                options: [
+                    "Only the balance sheet from Yahoo Finance - it shows total liabilities",
+                    "Annual report (Notes to the accounts for detailed debt breakdown, terms, and maturity schedules) + Companies House (for registered charges/mortgages against assets) + Bloomberg (for market pricing of bonds and credit ratings)",
+                    "Bloomberg Terminal alone - it has all bond market information",
+                    "Financial Times articles about the company's debt situation"
+                ],
+                correct: 1,
+                explanation: "The lecture lists what's found in each source: Annual reports contain 'notes to the accounts' (which detail debt instruments, terms, maturities); Companies House shows 'charges and mortgages' (legal claims against assets); Bloomberg provides 'fixed-income data and yield curves' (market pricing and trading information). Each source provides different PRIMARY or SECONDARY information. A balance sheet shows total debt but not details; Bloomberg has market data but not all contractual terms; Companies House has legal charges but not pricing."
+            },
+            {
+                question: "The lecture presents an Excel task: download historical price data from Yahoo Finance, import to Excel, format, filter, create charts, and identify trends. A student completes this and notices the stock price dropped 40% over 6 months. What additional information would demonstrate advanced financial literacy in interpreting this trend?",
+                options: [
+                    "Just noting the 40% decline is sufficient analysis",
+                    "Combining the quantitative price trend with: qualitative context from company announcements (explaining causes), sector performance comparison (is this company-specific or sector-wide?), fundamental data from financial statements (do financials justify the decline?), and macroeconomic conditions from government sources (broader market context)",
+                    "Checking if other students got the same result to verify accuracy",
+                    "Calculating the exact percentage decline more precisely"
+                ],
+                correct: 1,
+                explanation: "The lecture emphasizes financial literacy as 'the ability to process economic information and make informed decisions' requiring multiple skills: 'accessing, interpreting, and utilizing financial data.' A 40% decline is DATA; understanding WHAT IT MEANS requires context. The lecture teaches using multiple source types (primary financials, secondary analytics, press for context, government for macro) and both qualitative and quantitative data. Advanced literacy means integrating information sources to form judgments, not just observing numbers."
+            }
+        ];
+
+        // Timer effect
+        useEffect(() => {
+            if (showExplanation || quizComplete) return;
+
+            const timer = setInterval(() => {
+                setTimeRemaining((prev) => {
+                    if (prev <= 1) {
+                        setCanProceed(true);
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
+
+            return () => clearInterval(timer);
+        }, [currentQuestion, showExplanation, quizComplete]);
+
+        const formatTime = (seconds) => {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        };
+
+        const handleAnswer = (index) => {
+            if (!canProceed) return; // Can't answer until timer expires
+            setSelectedAnswer(index);
+            setShowExplanation(true);
+            if (index === questions[currentQuestion].correct) {
+                setScore(score + 1);
+            }
+        };
+
+        const handleNext = () => {
+            if (currentQuestion < questions.length - 1) {
+                setCurrentQuestion(currentQuestion + 1);
+                setSelectedAnswer(null);
+                setShowExplanation(false);
+                setTimeRemaining(120); // Reset timer
+                setCanProceed(false);
+            } else {
+                setQuizComplete(true);
+            }
+        };
+
+        const resetQuiz = () => {
+            setCurrentQuestion(0);
+            setSelectedAnswer(null);
+            setShowExplanation(false);
+            setScore(0);
+            setQuizComplete(false);
+            setTimeRemaining(120);
+            setCanProceed(false);
+        };
+
+        const getScoreColor = () => {
+            const percentage = (score / questions.length) * 100;
+            if (percentage >= 80) return 'text-green-600';
+            if (percentage >= 60) return 'text-yellow-600';
+            return 'text-red-600';
+        };
+
+        const getTimerColor = () => {
+            if (timeRemaining > 60) return 'text-blue-600';
+            if (timeRemaining > 30) return 'text-yellow-600';
+            return 'text-green-600';
+        };
+
+        if (quizComplete) {
+            const percentage = Math.round((score / questions.length) * 100);
+            return (
+                <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-2xl">
+                    <div className="text-center">
+                        <h2 className="text-3xl font-bold mb-4">Quiz Complete!</h2>
+                        <div className={`text-6xl font-bold mb-4 ${getScoreColor()}`}>
+                            {score}/{questions.length}
+                        </div>
+                        <p className="text-xl mb-2">You scored {percentage}%</p>
+                        <p className="text-gray-600 mb-6">
+                            {percentage >= 80 && "Outstanding! You have excellent understanding of financial data sources and their applications."}
+                            {percentage >= 60 && percentage < 80 && "Good work! You grasp most concepts. Review the explanations to strengthen your understanding."}
+                            {percentage < 60 && "Keep learning! This material is challenging. Review the lecture notes and try again."}
+                        </p>
+                        <button
+                            onClick={resetQuiz}
+                            className="bg-blue-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 mx-auto hover:bg-blue-700 transition"
+                        >
+                            <RotateCcw size={20} />
+                            Retake Quiz
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        const q = questions[currentQuestion];
+        const progressPercentage = ((currentQuestion + 1) / questions.length) * 100;
+
+        return (
+            <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-2xl">
+                <div className="mb-4">
+                    <h1 className="text-3xl font-bold text-center text-blue-700 mb-2">Financial Data Sources Quiz</h1>
+                    <p className="text-center text-gray-600 text-sm mb-4">Take your time - each question requires careful analysis</p>
+                </div>
+                
+                {/* Timer Display */}
+                {!showExplanation && (
+                    <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-200">
+                        <div className="flex items-center justify-center gap-3">
+                            <Clock size={24} className={getTimerColor()} />
+                            <div className="text-center">
+                                <div className={`text-3xl font-bold ${getTimerColor()}`}>
+                                    {formatTime(timeRemaining)}
+                                </div>
+                                <div className="text-sm text-gray-600 mt-1">
+                                    {canProceed ? "You may now answer" : "Think carefully before answering"}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+                
+                <div className="mb-6">
+                    <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm text-gray-600 font-semibold">
+                            Question {currentQuestion + 1} of {questions.length}
+                        </span>
+                        <span className="text-sm font-semibold text-blue-600">
+                            Score: {score}/{questions.length}
+                        </span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-3">
+                        <div
+                            className="bg-gradient-to-r from-blue-500 to-indigo-600 h-3 rounded-full transition-all duration-300"
+                            style={{ width: `${progressPercentage}%` }}
+                        />
+                    </div>
+                </div>
+
+                <h2 className="text-xl font-bold mb-6 leading-relaxed text-gray-800">{q.question}</h2>
+
+                <div className="space-y-3 mb-6">
+                    {q.options.map((option, index) => {
+                        let buttonClass = "w-full text-left p-4 rounded-lg border-2 transition-all ";
+                        
+                        if (selectedAnswer === null) {
+                            if (canProceed) {
+                                buttonClass += "border-gray-300 hover:border-blue-400 hover:bg-blue-50 cursor-pointer";
+                            } else {
+                                buttonClass += "border-gray-300 bg-gray-50 cursor-not-allowed opacity-60";
+                            }
+                        } else if (index === q.correct) {
+                            buttonClass += "border-green-500 bg-green-50";
+                        } else if (index === selectedAnswer) {
+                            buttonClass += "border-red-500 bg-red-50";
+                        } else {
+                            buttonClass += "border-gray-300 opacity-50";
+                        }
+
+                        return (
+                            <button
+                                key={index}
+                                onClick={() => handleAnswer(index)}
+                                disabled={!canProceed || showExplanation}
+                                className={buttonClass}
+                            >
+                                <div className="flex items-start justify-between gap-3">
+                                    <span className="text-sm leading-relaxed flex-1">{option}</span>
+                                    {showExplanation && index === q.correct && (
+                                        <CheckCircle className="text-green-600 flex-shrink-0" size={24} />
+                                    )}
+                                    {showExplanation && index === selectedAnswer && index !== q.correct && (
+                                        <XCircle className="text-red-600 flex-shrink-0" size={24} />
+                                    )}
+                                </div>
+                            </button>
+                        );
+                    })}
+                </div>
+
+                {!canProceed && !showExplanation && (
+                    <div className="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded">
+                        <p className="text-sm text-yellow-800">
+                            ⏳ Please read the question carefully. You can select an answer when the timer reaches 0:00.
+                        </p>
+                    </div>
+                )}
+
+                {showExplanation && (
+                    <div className="mb-6 p-5 bg-blue-50 border-l-4 border-blue-600 rounded-lg">
+                        <h3 className="font-bold mb-3 text-blue-900 text-lg">Explanation:</h3>
+                        <p className="text-gray-700 leading-relaxed">{q.explanation}</p>
+                    </div>
+                )}
+
+                {showExplanation && (
+                    <button
+                        onClick={handleNext}
+                        className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition shadow-lg"
+                    >
+                        {currentQuestion < questions.length - 1 ? 'Next Question →' : 'See Results 🎯'}
+                    </button>
+                )}
+            </div>
+        );
+    };
+
+    ReactDOM.render(<Quiz />, document.getElementById('root'));
+</script>
+```
+
+</body>
+</html>
